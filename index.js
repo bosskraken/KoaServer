@@ -4,17 +4,27 @@ const body = require('koa-body');
 const koaLogger = require('koa-logger');
 const mount = require('koa-mount');
 const validate = require('koa-validate');
+const views = require('koa-views');
 /* archivos importados */
 const logger = require('./logger.js');
 const userRouter = require("./routes/user.router.js");
 const FilmValidator = require("./validators/user.validator.js");
+const htmlRouter = require("./routes/html.router.js");
 
 const app = new Koa();
 app.use(body());
 app.use(userRouter.routes());
 app.use(mount('/api/v1', userRouter.routes()));
 validate(app);
+/* render */
 
+app.use(views(__dirname + '/views', {
+    map: {
+        ejs: 'ejs'
+    }
+}));
+app.use(htmlRouter.routes());
+/* fin render */
 if (process.env.NODE_ENV === 'dev') {
     app.use(koaLogger());
 }
