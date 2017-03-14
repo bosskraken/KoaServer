@@ -1,7 +1,12 @@
 const Koa = require('koa');
+const body = require('koa-body');
 const koaLogger = require('koa-logger');
 const logger = require('./logger.js');
+const filmRouter = require("./routes/film.router.js");
+
 const app = new Koa();
+app.use(body());
+app.use(filmRouter.routes());
 
 if (process.env.NODE_ENV === 'dev') {
     app.use(koaLogger());
@@ -12,12 +17,6 @@ app.use(async(ctx, next) => {
     const time = Date.now() - start;
     //set the header
     ctx.set('X-Response-Time', `${time} ms`);
-});
-app.use(async(ctx, next) => {
-    logger.debug(`The request url is ${ctx.url}`);
-    ctx.body = {
-        ok: 1
-    };
 });
 app.listen(3000, function(err) {
     if (err) {
