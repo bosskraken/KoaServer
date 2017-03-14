@@ -1,12 +1,14 @@
 const Koa = require('koa');
 const body = require('koa-body');
 const koaLogger = require('koa-logger');
+const mount = require('koa-mount');
 const logger = require('./logger.js');
 const filmRouter = require("./routes/film.router.js");
 
 const app = new Koa();
 app.use(body());
 app.use(filmRouter.routes());
+app.use(mount('/api/v1', filmRouter.routes()));
 
 if (process.env.NODE_ENV === 'dev') {
     app.use(koaLogger());

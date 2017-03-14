@@ -4,6 +4,7 @@ let films = [];
 let nextId = 0;
 /* claise FilmRouter */
 class FilmRouter {
+    /* metodos */
     static async get(ctx) {
         logger.info('Obtaining all films');
         ctx.body = films;
@@ -53,7 +54,7 @@ class FilmRouter {
     }
 };
 /* Creamos un nuevo router y le ponemos como prefijo ‘/fim’ que es la parte común en todas
- * nuestros endpoints. */
+ * nuestros endpoints(el padre). */
 const router = new Router({
     prefix: '/film'
 });
