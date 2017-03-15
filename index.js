@@ -5,6 +5,9 @@ const koaLogger = require('koa-logger');
 const mount = require('koa-mount');
 const validate = require('koa-validate');
 const views = require('koa-views');
+const convert = require('koa-convert');
+const session = require('koa-generic-session');
+const File = require('koa-generic-session-file');
 /* archivos importados */
 const logger = require('./logger.js');
 const userRouter = require("./routes/user.router.js");
@@ -16,13 +19,29 @@ app.use(body());
 app.use(userRouter.routes());
 app.use(mount('/api/v1', userRouter.routes()));
 validate(app);
+/* sesion */
+/* definos la clave de la sesion */
+app.keys = ['SAN'];
+/* registramos el middleware de session */
+app.use(convert(session({
+    store: new File({
+        sessionDirectory: '/sessions'
+    })
+})));
+app.use(async(ctx, next) => {
+    logger.info('entra');
+    logger.info(`Last request was ${ctx.session.lastRequest}`);
+    ctx.session.lastRequest = new Date();
+    await next();
+});
+/* fin sesion */
 /* render */
-
-app.use(views(__dirname + '/views', {
+/*app.use(views(__dirname + '/views', {
     map: {
         ejs: 'ejs'
     }
 }));
+
 app.use(htmlRouter.routes());
 /* fin render */
 if (process.env.NODE_ENV === 'dev') {
