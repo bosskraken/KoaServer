@@ -9,6 +9,7 @@ const convert = require('koa-convert');
 const session = require('koa-generic-session');
 const File = require('koa-generic-session-file');
 const mongoose = require('mongoose');
+const passport = require('koa-passport');
 //Url de conexion: 
 const mongoUri = 'mongodb://localhost:27017/users'
     /* archivos importados */
@@ -28,16 +29,16 @@ const onDBReady = (err) => {
     }
     app.keys = ['bille123'];
 
-    app.use(convert(session({
-        store: new File({
-            sessionDirectory: __dirname + '/sessions'
-        })
-    })));
-    app.use(async(ctx, next) => {
-        logger.info(`Last request was ${ctx.session.lastRequest}`);
-        ctx.session.lastRequest = new Date();
-        await next();
-    });
+    /*  app.use(convert(session({
+          store: new File({
+              sessionDirectory: __dirname + '/sessions'
+          })
+      })));*/
+    /* app.use(async(ctx, next) => {
+         logger.info(`Last request was ${ctx.session.lastRequest}`);
+         ctx.session.lastRequest = new Date();
+         await next();
+     });*/
     app.use(body());
     app.use(async(ctx, next) => {
         const start = Date.now();
@@ -51,7 +52,12 @@ const onDBReady = (err) => {
             ejs: 'ejs'
         }
     }));
-    app.use(mount('/users', userRouter.routes()));
+
+    require('./services/auth.service.js');
+    app.use(passport.initialize());
+    app.use(passport.session());
+    app.use(passport.authenticate('basic'));
+    app.use(mount('/padre', userRouter.routes()));
     app.use(htmlRouter.routes());
     app.listen(3000, function(err) {
         if (err) {
@@ -62,4 +68,8 @@ const onDBReady = (err) => {
 
     });
 }
-mongoose.connect(mongoUri, onDBReady);
+try {
+    mongoose.connect(mongoUri, onDBReady);
+} catch (error) {
+    console.log(error)
+}

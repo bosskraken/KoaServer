@@ -8,7 +8,7 @@ class HtmlRouter {
         ctx.body = {
             ctx: 'json'
         }
-        var this_ctx = ctx.body.json.gender;
+        var this_ctx = ctx.body.name;
         await ctx.render('index.ejs', this_ctx);
     }
 }
