@@ -14,6 +14,7 @@ async function registerUserBasic(username, password, done) {
     };
 
 
+
     passport.serializeUser(async(user, done) => {
         done(null, user._id);
     });
